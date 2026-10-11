@@ -21,3 +21,4 @@ if ! nc -z 127.0.0.1 $PORT 2>/dev/null; then
 else
     echo "==> MySQL is already running on port $PORT"
 fi
+

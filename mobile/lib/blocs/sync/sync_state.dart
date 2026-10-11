@@ -51,3 +51,4 @@ class SyncFailure extends SyncState {
   @override
   List<Object?> get props => [message, lastSyncTime, unsyncedCount];
 }
+

@@ -37,3 +37,4 @@ class CustomerError extends CustomerState {
   @override
   List<Object?> get props => [message];
 }
+

@@ -76,3 +76,4 @@ public class Site {
     public List<FieldNote> getNotes() { return notes; }
     public void setNotes(List<FieldNote> notes) { this.notes = notes; }
 }
+

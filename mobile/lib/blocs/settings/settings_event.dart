@@ -25,3 +25,4 @@ class UpdateBaseUrlEvent extends SettingsEvent {
   @override
   List<Object?> get props => [baseUrl];
 }
+

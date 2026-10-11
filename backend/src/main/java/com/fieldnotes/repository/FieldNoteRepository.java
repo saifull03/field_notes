@@ -60,3 +60,4 @@ public interface FieldNoteRepository extends JpaRepository<FieldNote, String> {
            "WHERE c.user.id = :userId")
     List<FieldNote> findAllByUserId(@Param("userId") Long userId);
 }
+

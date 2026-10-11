@@ -9,3 +9,4 @@ public class FieldNotesApplication {
         SpringApplication.run(FieldNotesApplication.class, args);
     }
 }
+

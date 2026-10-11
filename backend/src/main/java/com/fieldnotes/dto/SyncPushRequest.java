@@ -19,3 +19,4 @@ public class SyncPushRequest {
     public List<FieldNoteDto> getNotes() { return notes; }
     public void setNotes(List<FieldNoteDto> notes) { this.notes = notes; }
 }
+

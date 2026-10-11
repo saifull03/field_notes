@@ -12,3 +12,4 @@ export PATH="$JAVA_HOME/bin:/home/saiful-islam/tools/maven/bin:$PATH"
 echo "==> Starting Spring Boot backend on port 8080..."
 cd "$SCRIPT_DIR/backend"
 mvn spring-boot:run
+

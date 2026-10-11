@@ -9,3 +9,4 @@ abstract class SyncEvent extends Equatable {
 class TriggerSyncEvent extends SyncEvent {}
 
 class CheckSyncStatusEvent extends SyncEvent {}
+

@@ -188,3 +188,4 @@ flutter test
 |---|---|---|
 | `GET` | `/api/sync/pull` | Pull records updated since timestamp (or all on reinstall) |
 | `POST` | `/api/sync/push` | Push offline batch changes to server |
+

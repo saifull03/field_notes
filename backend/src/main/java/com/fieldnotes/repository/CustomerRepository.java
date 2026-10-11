@@ -15,3 +15,4 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
     List<Customer> findByUserIdAndUpdatedAtAfter(Long userId, Instant updatedAt);
     List<Customer> findByUserId(Long userId);
 }
+

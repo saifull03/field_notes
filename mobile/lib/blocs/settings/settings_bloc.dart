@@ -30,3 +30,4 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(SettingsLoaded(defaultNoteStatus: status, baseUrl: event.baseUrl.trim()));
   }
 }
+

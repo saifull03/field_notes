@@ -33,3 +33,4 @@ class ApiConstants {
   static const String endpointSyncPull = '/api/sync/pull';
   static const String endpointSyncPush = '/api/sync/push';
 }
+

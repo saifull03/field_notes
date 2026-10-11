@@ -37,3 +37,4 @@ class SiteError extends SiteState {
   @override
   List<Object?> get props => [message];
 }
+

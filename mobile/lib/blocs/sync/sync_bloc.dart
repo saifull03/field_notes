@@ -56,3 +56,4 @@ class SyncBloc extends Bloc<SyncEvent, SyncState> {
     }
   }
 }
+

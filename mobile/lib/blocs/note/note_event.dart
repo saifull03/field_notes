@@ -67,3 +67,4 @@ class DeleteNoteEvent extends NoteEvent {
   @override
   List<Object?> get props => [noteId];
 }
+

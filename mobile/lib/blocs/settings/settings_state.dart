@@ -20,3 +20,4 @@ class SettingsLoaded extends SettingsState {
   @override
   List<Object?> get props => [defaultNoteStatus, baseUrl];
 }
+

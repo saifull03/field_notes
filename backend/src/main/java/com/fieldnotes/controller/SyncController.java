@@ -49,3 +49,4 @@ public class SyncController {
         return ResponseEntity.ok(syncService.pushSync(user, request));
     }
 }
+

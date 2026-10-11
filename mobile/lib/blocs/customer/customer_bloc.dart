@@ -93,3 +93,4 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     }
   }
 }
+

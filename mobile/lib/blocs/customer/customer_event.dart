@@ -36,3 +36,4 @@ class DeleteCustomerEvent extends CustomerEvent {
   @override
   List<Object?> get props => [customerId];
 }
+

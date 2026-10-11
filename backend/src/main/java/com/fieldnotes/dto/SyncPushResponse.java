@@ -36,3 +36,4 @@ public class SyncPushResponse {
     public List<String> getSyncedNoteIds() { return syncedNoteIds; }
     public void setSyncedNoteIds(List<String> syncedNoteIds) { this.syncedNoteIds = syncedNoteIds; }
 }
+

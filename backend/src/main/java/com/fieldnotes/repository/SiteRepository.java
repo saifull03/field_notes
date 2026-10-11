@@ -16,3 +16,4 @@ public interface SiteRepository extends JpaRepository<Site, String> {
     List<Site> findByCustomerUserIdAndUpdatedAtAfter(Long userId, Instant updatedAt);
     List<Site> findByCustomerUserId(Long userId);
 }
+

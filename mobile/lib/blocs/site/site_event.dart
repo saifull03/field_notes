@@ -48,3 +48,4 @@ class DeleteSiteEvent extends SiteEvent {
   @override
   List<Object?> get props => [siteId];
 }
+

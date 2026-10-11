@@ -190,3 +190,4 @@ public class SyncService {
         return new SyncPushResponse(serverTime, true, syncedCustomers, syncedSites, syncedNotes);
     }
 }
+
