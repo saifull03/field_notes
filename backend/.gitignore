@@ -1,0 +1,15 @@
+target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+uploads/*
+!uploads/.gitkeep
+.idea/
+*.iml
+.vscode/
+.DS_Store
