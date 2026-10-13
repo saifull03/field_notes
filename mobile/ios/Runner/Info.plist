@@ -24,6 +24,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Field Notes uses the camera to attach inspection photos to field notes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Field Notes uses your photo library to attach inspection photos to field notes.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

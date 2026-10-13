@@ -146,14 +146,27 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
   }
 
   Future<void> _pickPhoto(bool fromCamera) async {
-    final path = fromCamera
-        ? await _mediaService.pickImageFromCamera()
-        : await _mediaService.pickImageFromGallery();
+    try {
+      final path = fromCamera
+          ? await _mediaService.pickImageFromCamera()
+          : await _mediaService.pickImageFromGallery();
 
-    if (path != null) {
-      setState(() {
-        _localPhotoPath = path;
-      });
+      if (path != null && mounted) {
+        setState(() {
+          _localPhotoPath = path;
+        });
+      }
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            fromCamera
+                ? 'Could not take photo. Check camera permission and device camera: $error'
+                : 'Could not open gallery. Check photo permission: $error',
+          ),
+        ),
+      );
     }
   }
 
