@@ -1,6 +1,21 @@
-# field_notes
+# Field Notes
 
-A new Flutter project.
+Field Notes is an offline-first field inspection app. Customers, sites, notes,
+photos, GPS data, and deletions are saved to the device before any network
+request is attempted.
+
+## Offline and online behavior
+
+- Create, edit, and delete records while offline; changes remain in local Hive
+  storage and are shown immediately.
+- When connectivity returns, the app automatically pushes pending local
+  changes and pulls server changes.
+- Opening the dashboard and using **Sync Now** also starts synchronization.
+- Multiple sync triggers are coalesced into one operation.
+- Conflicting records use the newest `updatedAt` timestamp. A newer local
+  unsynced edit is retained until it is pushed successfully.
+- If the backend is unavailable, local work is retained and the next
+  connectivity event retries synchronization.
 
 ## Getting Started
 

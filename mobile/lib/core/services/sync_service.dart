@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import '../constants/api_constants.dart';
 import '../network/api_client.dart';
 import 'storage_service.dart';
@@ -22,10 +23,27 @@ class SyncOutcome {
 class SyncService {
   final ApiClient apiClient;
   final StorageService storageService;
+  Future<SyncOutcome>? _activeSync;
 
   SyncService(this.apiClient, this.storageService);
 
   Future<SyncOutcome> synchronize() async {
+    final activeSync = _activeSync;
+    if (activeSync != null) {
+      return activeSync;
+    }
+
+    final sync = _synchronize();
+    _activeSync = sync;
+    sync.whenComplete(() {
+      if (identical(_activeSync, sync)) {
+        _activeSync = null;
+      }
+    });
+    return sync;
+  }
+
+  Future<SyncOutcome> _synchronize() async {
     var token = storageService.getToken();
     if (token == null || token.isEmpty) {
       return SyncOutcome(
@@ -36,8 +54,11 @@ class SyncService {
 
     if (token == 'local-offline-token') {
       final user = storageService.getUser();
-      final localCred = user != null ? storageService.findLocalUserCredential(user.username) : null;
-      final password = localCred?['password'] as String? ?? 'OfflinePassword123!';
+      final localCred = user != null
+          ? storageService.findLocalUserCredential(user.username)
+          : null;
+      final password =
+          localCred?['password'] as String? ?? 'OfflinePassword123!';
 
       if (user != null) {
         try {
@@ -46,12 +67,15 @@ class SyncService {
             body: {
               'username': user.username,
               'email': user.email,
-              'password': password.isNotEmpty ? password : 'OfflinePassword123!',
+              'password': password.isNotEmpty
+                  ? password
+                  : 'OfflinePassword123!',
               if (user.fullName != null) 'fullName': user.fullName,
             },
             timeout: const Duration(seconds: 4),
           );
-          if (regResponse is Map<String, dynamic> && regResponse.containsKey('token')) {
+          if (regResponse is Map<String, dynamic> &&
+              regResponse.containsKey('token')) {
             token = regResponse['token'] as String;
             await storageService.saveToken(token);
           }
@@ -61,19 +85,21 @@ class SyncService {
               ApiConstants.endpointLogin,
               body: {
                 'username': user.username,
-                'password': password.isNotEmpty ? password : 'OfflinePassword123!',
+                'password': password.isNotEmpty
+                    ? password
+                    : 'OfflinePassword123!',
               },
               timeout: const Duration(seconds: 4),
             );
-            if (loginResponse is Map<String, dynamic> && loginResponse.containsKey('token')) {
+            if (loginResponse is Map<String, dynamic> &&
+                loginResponse.containsKey('token')) {
               token = loginResponse['token'] as String;
               await storageService.saveToken(token);
             }
           } catch (_) {
             return SyncOutcome(
               success: false,
-              message:
-                  'Running in Standalone Mode. All records are stored locally on your device. Configure your computer Wi-Fi IP in Settings to sync.',
+              message: 'Running in Standalone Mode. All records are stored locally on your device. Configure your computer Wi-Fi IP in Settings to sync.',
             );
           }
         }
@@ -99,7 +125,9 @@ class SyncService {
           final file = File(currentNote.localPhotoPath!);
           if (await file.exists()) {
             try {
-              final remoteUrl = await apiClient.uploadPhoto(currentNote.localPhotoPath!);
+              final remoteUrl = await apiClient.uploadPhoto(
+                currentNote.localPhotoPath!,
+              );
               currentNote = currentNote.copyWith(photoUrl: remoteUrl);
               await storageService.saveNote(currentNote);
             } catch (_) {
@@ -110,14 +138,19 @@ class SyncService {
         processedNotes.add(currentNote);
       }
 
-      if (unsyncedCustomers.isNotEmpty || unsyncedSites.isNotEmpty || processedNotes.isNotEmpty) {
+      if (unsyncedCustomers.isNotEmpty ||
+          unsyncedSites.isNotEmpty ||
+          processedNotes.isNotEmpty) {
         final pushBody = {
           'customers': unsyncedCustomers.map((c) => c.toJson()).toList(),
           'sites': unsyncedSites.map((s) => s.toJson()).toList(),
           'notes': processedNotes.map((n) => n.toJson()).toList(),
         };
 
-        final response = await apiClient.post(ApiConstants.endpointSyncPush, body: pushBody);
+        final response = await apiClient.post(
+          ApiConstants.endpointSyncPush,
+          body: pushBody,
+        );
         if (response != null && response is Map<String, dynamic>) {
           final pushResult = SyncPushResult.fromJson(response);
           if (pushResult.success) {
@@ -142,7 +175,8 @@ class SyncService {
                 await storageService.saveNote(n.copyWith(isSynced: true));
               }
             }
-            totalPushed = pushResult.syncedCustomerIds.length +
+            totalPushed =
+                pushResult.syncedCustomerIds.length +
                 pushResult.syncedSiteIds.length +
                 pushResult.syncedNoteIds.length;
           }
@@ -166,9 +200,17 @@ class SyncService {
 
         // Merge customers
         for (var remoteCustomer in pullData.customers) {
-          final localCustomer = storageService.getCustomerById(remoteCustomer.id);
-          if (localCustomer == null || localCustomer.isSynced) {
-            await storageService.saveCustomer(remoteCustomer.copyWith(isSynced: true));
+          final localCustomer = storageService.getCustomerById(
+            remoteCustomer.id,
+          );
+          if (_shouldApplyRemote(
+            localCustomer?.isSynced,
+            localCustomer?.updatedAt,
+            remoteCustomer.updatedAt,
+          )) {
+            await storageService.saveCustomer(
+              remoteCustomer.copyWith(isSynced: true),
+            );
             totalPulled++;
           }
         }
@@ -176,7 +218,11 @@ class SyncService {
         // Merge sites
         for (var remoteSite in pullData.sites) {
           final localSite = storageService.getSiteById(remoteSite.id);
-          if (localSite == null || localSite.isSynced) {
+          if (_shouldApplyRemote(
+            localSite?.isSynced,
+            localSite?.updatedAt,
+            remoteSite.updatedAt,
+          )) {
             await storageService.saveSite(remoteSite.copyWith(isSynced: true));
             totalPulled++;
           }
@@ -185,7 +231,11 @@ class SyncService {
         // Merge notes
         for (var remoteNote in pullData.notes) {
           final localNote = storageService.getNoteById(remoteNote.id);
-          if (localNote == null || localNote.isSynced) {
+          if (_shouldApplyRemote(
+            localNote?.isSynced,
+            localNote?.updatedAt,
+            remoteNote.updatedAt,
+          )) {
             // Preserve local photo path if present
             final mergedNote = remoteNote.copyWith(
               localPhotoPath: localNote?.localPhotoPath,
@@ -207,10 +257,18 @@ class SyncService {
         message: 'Synchronization completed successfully.',
       );
     } catch (e) {
-      return SyncOutcome(
-        success: false,
-        message: 'Sync failed: $e',
-      );
+      return SyncOutcome(success: false, message: 'Sync failed: $e');
     }
+  }
+
+  bool _shouldApplyRemote(
+    bool? localIsSynced,
+    DateTime? localUpdatedAt,
+    DateTime remoteUpdatedAt,
+  ) {
+    if (localUpdatedAt == null || localIsSynced == null || localIsSynced) {
+      return true;
+    }
+    return remoteUpdatedAt.isAfter(localUpdatedAt);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../blocs/customer/customer_bloc.dart';
 import '../../blocs/customer/customer_event.dart';
 import '../../blocs/note/note_bloc.dart';
@@ -50,6 +51,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     context.read<CustomerBloc>().add(LoadCustomersEvent());
     context.read<SiteBloc>().add(const LoadSitesEvent());
     context.read<SyncBloc>().add(CheckSyncStatusEvent());
+    context.read<SyncBloc>().add(TriggerSyncEvent());
   }
 
   @override
@@ -71,10 +73,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (idx) {
@@ -113,4 +112,3 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 }
-
