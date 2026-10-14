@@ -378,7 +378,7 @@ The mobile app can be launched as a web application (accessible from any browser
 ./run-app.sh -d chrome
 ```
 
-> **Browser Note (Ubuntu 24.10/25.10)**: Due to an upstream GNOME 47/GTK xsettings issue in Ubuntu (`Settings schema 'org.gnome.settings-daemon.plugins.xsettings' does not contain a key named 'antialiasing'`), launching Google Chrome directly via Flutter may trigger an automated crash. `./run-app.sh` automatically falls back to Brave if available, or you can use `./run-app.sh` (or `flutter run -d web-server --web-port=3000`) and open `http://localhost:3000` in any web browser.
+> **Ubuntu 24.10/25.10 GTK Note**: In GNOME 47/48 on Ubuntu 24.10/25.10, the `antialiasing` key was relocated, causing unpatched GTK3 apps (Chrome and native Flutter Linux desktop) to abort with `GLib-GIO-ERROR`. This repository includes precompiled patched schemas in `.glib-schemas/` which `./run-app.sh` automatically configures via `GSETTINGS_SCHEMA_DIR`. Both `./run-app.sh -d linux` and `./run-app.sh -d chrome` will run cleanly. Alternatively, running `./run-app.sh` (or `flutter run -d web-server --web-port=3000`) runs as an HTTP web application accessible in any modern browser without relying on local GTK libraries.
 
 > **Note for Android Emulators**: Use `http://10.0.2.2:8080` as the Backend Server URL in Settings or the Login screen. For physical Android devices, enter your machine's local Wi-Fi IP (e.g. `http://192.168.1.100:8080`).
 

@@ -4,6 +4,12 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PATH="/home/saiful-islam/tools/flutter/bin:$PATH"
 
+# Fix for Ubuntu 24.10/25.10 GTK / GLib-GIO antialiasing crash in Flutter desktop & Chrome.
+# GNOME 47/48 moved xsettings keys causing GTK3 apps to abort with GLib-GIO-ERROR.
+if [ -d "$SCRIPT_DIR/.glib-schemas" ]; then
+    export GSETTINGS_SCHEMA_DIR="$SCRIPT_DIR/.glib-schemas${GSETTINGS_SCHEMA_DIR:+:$GSETTINGS_SCHEMA_DIR}"
+fi
+
 # In Ubuntu 24.10/25.10, google-chrome has a known GTK/GIO antialiasing crash.
 # If Brave is available and CHROME_EXECUTABLE is not set, default to Brave.
 if [ -z "$CHROME_EXECUTABLE" ] && [ -x "/snap/bin/brave" ]; then
