@@ -208,6 +208,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               )
                             : const Text('Log In'),
                       ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.offline_bolt_rounded, color: Color(0xFF0F766E)),
+                        label: const Text('Work in Standalone Mode (No Server Needed)'),
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                final uname = _usernameController.text.trim();
+                                context.read<AuthBloc>().add(
+                                      ContinueOfflineEvent(
+                                        username: uname.isNotEmpty ? uname : 'field_inspector',
+                                        fullName: uname.isNotEmpty ? uname : 'Field Inspector',
+                                      ),
+                                    );
+                              },
+                      ),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

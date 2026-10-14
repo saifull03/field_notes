@@ -62,6 +62,45 @@ class StorageService {
     await _settingsBox.delete(ApiConstants.keyUser);
   }
 
+  static const String keyLocalUsers = 'pref_local_users';
+
+  Map<String, dynamic> _getLocalUsersMap() {
+    final raw = _settingsBox.get(keyLocalUsers);
+    if (raw is Map) {
+      return Map<String, dynamic>.from(raw);
+    }
+    return <String, dynamic>{};
+  }
+
+  Future<void> saveLocalUserCredential({
+    required String username,
+    required String email,
+    String? fullName,
+    required String password,
+    required String id,
+  }) async {
+    final map = _getLocalUsersMap();
+    final userRecord = {
+      'id': id,
+      'username': username,
+      'email': email,
+      'fullName': fullName ?? username,
+      'password': password,
+    };
+    map[username.toLowerCase().trim()] = userRecord;
+    map[email.toLowerCase().trim()] = userRecord;
+    await _settingsBox.put(keyLocalUsers, map);
+  }
+
+  Map<String, dynamic>? findLocalUserCredential(String usernameOrEmail) {
+    final map = _getLocalUsersMap();
+    final val = map[usernameOrEmail.toLowerCase().trim()];
+    if (val is Map) {
+      return Map<String, dynamic>.from(val);
+    }
+    return null;
+  }
+
   String getDefaultNoteStatus() {
     return _settingsBox.get(ApiConstants.keyDefaultNoteStatus, defaultValue: 'Draft') as String;
   }

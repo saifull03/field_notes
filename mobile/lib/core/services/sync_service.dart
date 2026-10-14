@@ -26,12 +26,58 @@ class SyncService {
   SyncService(this.apiClient, this.storageService);
 
   Future<SyncOutcome> synchronize() async {
-    final token = storageService.getToken();
+    var token = storageService.getToken();
     if (token == null || token.isEmpty) {
       return SyncOutcome(
         success: false,
         message: 'User is not logged in. Cannot synchronize.',
       );
+    }
+
+    if (token == 'local-offline-token') {
+      final user = storageService.getUser();
+      final localCred = user != null ? storageService.findLocalUserCredential(user.username) : null;
+      final password = localCred?['password'] as String? ?? 'OfflinePassword123!';
+
+      if (user != null) {
+        try {
+          final regResponse = await apiClient.post(
+            ApiConstants.endpointRegister,
+            body: {
+              'username': user.username,
+              'email': user.email,
+              'password': password.isNotEmpty ? password : 'OfflinePassword123!',
+              if (user.fullName != null) 'fullName': user.fullName,
+            },
+            timeout: const Duration(seconds: 4),
+          );
+          if (regResponse is Map<String, dynamic> && regResponse.containsKey('token')) {
+            token = regResponse['token'] as String;
+            await storageService.saveToken(token);
+          }
+        } catch (_) {
+          try {
+            final loginResponse = await apiClient.post(
+              ApiConstants.endpointLogin,
+              body: {
+                'username': user.username,
+                'password': password.isNotEmpty ? password : 'OfflinePassword123!',
+              },
+              timeout: const Duration(seconds: 4),
+            );
+            if (loginResponse is Map<String, dynamic> && loginResponse.containsKey('token')) {
+              token = loginResponse['token'] as String;
+              await storageService.saveToken(token);
+            }
+          } catch (_) {
+            return SyncOutcome(
+              success: false,
+              message:
+                  'Running in Standalone Mode. All records are stored locally on your device. Configure your computer Wi-Fi IP in Settings to sync.',
+            );
+          }
+        }
+      }
     }
 
     int totalPushed = 0;

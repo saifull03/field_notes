@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -56,11 +57,15 @@ class ApiClient {
     return Uri.parse(uriString);
   }
 
-  Future<dynamic> get(String endpoint, {Map<String, dynamic>? queryParams}) async {
+  Future<dynamic> get(String endpoint, {Map<String, dynamic>? queryParams, Duration? timeout}) async {
     try {
       final uri = _buildUri(endpoint, queryParams);
-      final response = await _client.get(uri, headers: _buildHeaders()).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .get(uri, headers: _buildHeaders())
+          .timeout(timeout ?? const Duration(seconds: 4));
       return _processResponse(response);
+    } on TimeoutException {
+      throw ApiException('Backend server unreachable (connection timed out).');
     } on SocketException {
       throw ApiException('No internet connection or backend unreachable.');
     } on http.ClientException {
@@ -71,7 +76,7 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> post(String endpoint, {dynamic body}) async {
+  Future<dynamic> post(String endpoint, {dynamic body, Duration? timeout}) async {
     try {
       final uri = _buildUri(endpoint);
       final response = await _client
@@ -80,8 +85,10 @@ class ApiClient {
             headers: _buildHeaders(),
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(timeout ?? const Duration(seconds: 4));
       return _processResponse(response);
+    } on TimeoutException {
+      throw ApiException('Backend server unreachable (connection timed out).');
     } on SocketException {
       throw ApiException('No internet connection or backend unreachable.');
     } on http.ClientException {
@@ -92,7 +99,7 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> put(String endpoint, {dynamic body}) async {
+  Future<dynamic> put(String endpoint, {dynamic body, Duration? timeout}) async {
     try {
       final uri = _buildUri(endpoint);
       final response = await _client
@@ -101,8 +108,10 @@ class ApiClient {
             headers: _buildHeaders(),
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(timeout ?? const Duration(seconds: 4));
       return _processResponse(response);
+    } on TimeoutException {
+      throw ApiException('Backend server unreachable (connection timed out).');
     } on SocketException {
       throw ApiException('No internet connection or backend unreachable.');
     } on http.ClientException {
@@ -113,11 +122,15 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> delete(String endpoint) async {
+  Future<dynamic> delete(String endpoint, {Duration? timeout}) async {
     try {
       final uri = _buildUri(endpoint);
-      final response = await _client.delete(uri, headers: _buildHeaders()).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .delete(uri, headers: _buildHeaders())
+          .timeout(timeout ?? const Duration(seconds: 4));
       return _processResponse(response);
+    } on TimeoutException {
+      throw ApiException('Backend server unreachable (connection timed out).');
     } on SocketException {
       throw ApiException('No internet connection or backend unreachable.');
     } on http.ClientException {

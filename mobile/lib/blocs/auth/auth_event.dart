@@ -37,3 +37,13 @@ class RegisterEvent extends AuthEvent {
 
 class LogoutEvent extends AuthEvent {}
 
+class ContinueOfflineEvent extends AuthEvent {
+  final String? username;
+  final String? fullName;
+
+  const ContinueOfflineEvent({this.username, this.fullName});
+
+  @override
+  List<Object?> get props => [username, fullName];
+}
+

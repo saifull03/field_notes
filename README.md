@@ -376,11 +376,30 @@ The mobile app can be launched as a web application (accessible from any browser
 
 # Option C: Run on Chrome / Brave browser
 ./run-app.sh -d chrome
+
+# Option D: Build installable Android APK (Release)
+./build-apk.sh
+
+# Or build debug APK:
+./build-apk.sh --debug
 ```
+
+#### Installing APK on Mobile
+The compiled APK is generated at:
+- **Release (Optimized)**: `mobile/build/app/outputs/flutter-apk/app-release.apk`
+- **Debug**: `mobile/build/app/outputs/flutter-apk/app-debug.apk`
+
+To install directly to a connected Android phone or emulator via ADB:
+```bash
+/home/saiful-islam/Android/Sdk/platform-tools/adb install -r mobile/build/app/outputs/flutter-apk/app-release.apk
+```
+Or transfer `app-release.apk` directly to your phone via USB or Google Drive and open it to install.
 
 > **Ubuntu 24.10/25.10 GTK Note**: In GNOME 47/48 on Ubuntu 24.10/25.10, the `antialiasing` key was relocated, causing unpatched GTK3 apps (Chrome and native Flutter Linux desktop) to abort with `GLib-GIO-ERROR`. This repository includes precompiled patched schemas in `.glib-schemas/` which `./run-app.sh` automatically configures via `GSETTINGS_SCHEMA_DIR`. Both `./run-app.sh -d linux` and `./run-app.sh -d chrome` will run cleanly. Alternatively, running `./run-app.sh` (or `flutter run -d web-server --web-port=3000`) runs as an HTTP web application accessible in any modern browser without relying on local GTK libraries.
 
-> **Note for Android Emulators**: Use `http://10.0.2.2:8080` as the Backend Server URL in Settings or the Login screen. For physical Android devices, enter your machine's local Wi-Fi IP (e.g. `http://192.168.1.100:8080`).
+> **Note for Android Devices & Emulators**: 
+> - On **Android Emulators**, use `http://10.0.2.2:8080` as the Backend Server URL in Settings or the Login screen.
+> - On **Physical Android Devices**, ensure your phone is connected to the same Wi-Fi network as your PC and enter your computer's local IP (e.g. `http://192.168.1.100:8080`). Cleartext HTTP traffic is explicitly enabled in `AndroidManifest.xml`.
 
 ---
 

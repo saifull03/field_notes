@@ -4,6 +4,10 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 
+import '../../blocs/settings/settings_bloc.dart';
+import '../../blocs/settings/settings_event.dart';
+import '../../blocs/settings/settings_state.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -30,6 +34,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void _showServerConfigDialog() {
+    final settingsState = context.read<SettingsBloc>().state;
+    final currentUrl = settingsState is SettingsLoaded ? settingsState.baseUrl : 'http://localhost:8080';
+    final urlController = TextEditingController(text: currentUrl);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Backend Server URL'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Enter your computer Wi-Fi IP (e.g. http://192.168.1.100:8080). Leave as is if using Standalone Mode without PC.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                labelText: 'Server URL',
+                hintText: 'http://192.168.1.xxx:8080',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<SettingsBloc>().add(UpdateBaseUrlEvent(urlController.text.trim()));
+              Navigator.pop(dialogCtx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Backend URL updated')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
@@ -48,10 +98,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_ethernet_rounded),
+            tooltip: 'Configure Backend URL',
+            onPressed: _showServerConfigDialog,
+          ),
+        ],
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Welcome, ${state.user.fullName ?? state.user.username}! All notes are saved locally.',
+                ),
+                backgroundColor: const Color(0xFF0F766E),
+              ),
+            );
             Navigator.popUntil(context, (route) => route.isFirst);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -184,6 +249,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               )
                             : const Text('Create Account'),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.offline_bolt_rounded, color: Color(0xFF0F766E)),
+                        label: const Text('Work in Standalone Mode (No Server Needed)'),
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                final uname = _usernameController.text.trim();
+                                final fname = _fullNameController.text.trim();
+                                context.read<AuthBloc>().add(
+                                      ContinueOfflineEvent(
+                                        username: uname.isNotEmpty ? uname : 'rushad',
+                                        fullName: fname.isNotEmpty
+                                            ? fname
+                                            : (uname.isNotEmpty ? uname : 'Rushad'),
+                                      ),
+                                    );
+                              },
                       ),
                       const SizedBox(height: 16),
                       Row(
