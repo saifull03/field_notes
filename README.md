@@ -365,19 +365,20 @@ mvn spring-boot:run
 The REST API will be live at `http://localhost:8080`.
 
 ### 2. Launch Mobile App
-The mobile app can be launched on an Android emulator, physical device, Linux desktop, or Chrome web:
+The mobile app can be launched as a web application (accessible from any browser), native Linux desktop app, or on mobile emulators/devices:
 
 ```bash
-# Option A: Using the launcher script
-./run-app.sh -d chrome
-# or
+# Option A: Start Web Server (Recommended - runs on http://localhost:3000)
+./run-app.sh
+
+# Option B: Run as native Linux Desktop Application
 ./run-app.sh -d linux
 
-# Option B: Using Flutter directly
-cd mobile
-flutter pub get
-flutter run -d chrome
+# Option C: Run on Chrome / Brave browser
+./run-app.sh -d chrome
 ```
+
+> **Browser Note (Ubuntu 24.10/25.10)**: Due to an upstream GNOME 47/GTK xsettings issue in Ubuntu (`Settings schema 'org.gnome.settings-daemon.plugins.xsettings' does not contain a key named 'antialiasing'`), launching Google Chrome directly via Flutter may trigger an automated crash. `./run-app.sh` automatically falls back to Brave if available, or you can use `./run-app.sh` (or `flutter run -d web-server --web-port=3000`) and open `http://localhost:3000` in any web browser.
 
 > **Note for Android Emulators**: Use `http://10.0.2.2:8080` as the Backend Server URL in Settings or the Login screen. For physical Android devices, enter your machine's local Wi-Fi IP (e.g. `http://192.168.1.100:8080`).
 
