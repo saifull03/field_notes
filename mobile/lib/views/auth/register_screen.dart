@@ -7,6 +7,7 @@ import '../../blocs/auth/auth_state.dart';
 import '../../blocs/settings/settings_bloc.dart';
 import '../../blocs/settings/settings_event.dart';
 import '../../blocs/settings/settings_state.dart';
+import '../widgets/app_logo.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -141,6 +142,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const Center(
+                        child: AppLogo(size: 76, borderRadius: 19),
+                      ),
+                      const SizedBox(height: 16),
                       const Text(
                         'Join Field Notes',
                         textAlign: TextAlign.center,

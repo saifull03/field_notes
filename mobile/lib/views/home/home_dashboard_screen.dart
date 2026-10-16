@@ -14,6 +14,7 @@ import '../notes/note_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sites/site_list_screen.dart';
 import '../widgets/sync_status_badge.dart';
+import '../widgets/app_logo.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -58,7 +59,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
+        title: Row(
+          children: [
+            const AppLogo(size: 28, borderRadius: 7, showShadow: false),
+            const SizedBox(width: 10),
+            Text(_titles[_currentIndex]),
+          ],
+        ),
         actions: [
           const Center(child: SyncStatusBadge()),
           const SizedBox(width: 8),
